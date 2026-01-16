@@ -62,9 +62,19 @@ def process_results(data: dict) -> dict:
     values = first_series.get("values", [])
     count_non_negative = sum(1 for _, value in values if float(value) >= 0)
     
+    # Calculate actual elapsed time since midnight
+    now = datetime.now()
+    start_of_day = datetime.combine(date.today(), time())
+    elapsed_seconds = (now - start_of_day).total_seconds()
+    elapsed_hours = elapsed_seconds / 3600
+    
+    # Calculate hours with electricity based on actual data points (60 seconds per point)
     hours_with_electricity = round(count_non_negative / 60, 2)
-    hours_without_electricity = 24 - hours_with_electricity
-    percentage = round((count_non_negative / 1440) * 100, 2)
+    hours_without_electricity = round(elapsed_hours - hours_with_electricity, 2)
+    
+    # Calculate percentage based on actual elapsed time
+    total_data_points = len(values)
+    percentage = round((count_non_negative / total_data_points) * 100, 2) if total_data_points > 0 else 0
     
     message = (
         f"⚡ Electicity stat for the past day (since the midnight)⚡\n\n"
