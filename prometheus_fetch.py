@@ -66,20 +66,27 @@ def process_results(data: dict) -> dict:
     now = datetime.now()
     start_of_day = datetime.combine(date.today(), time())
     elapsed_seconds = (now - start_of_day).total_seconds()
-    elapsed_hours = elapsed_seconds / 3600
+    elapsed_minutes = elapsed_seconds / 60
     
-    # Calculate hours with electricity based on actual data points (60 seconds per point)
-    hours_with_electricity = round(count_non_negative / 60, 2)
-    hours_without_electricity = round(elapsed_hours - hours_with_electricity, 2)
+    # Calculate minutes with electricity (60 seconds per point)
+    minutes_with_electricity = count_non_negative
+    minutes_without_electricity = elapsed_minutes - minutes_with_electricity
     
-    # Calculate percentage based on actual elapsed time
-    total_data_points = len(values)
-    percentage = round((count_non_negative / total_data_points) * 100, 2) if total_data_points > 0 else 0
+    # Convert to hours and minutes
+    hours_with = int(minutes_with_electricity // 60)
+    mins_with = int(minutes_with_electricity % 60)
+    hours_without = int(minutes_without_electricity // 60)
+    mins_without = int(minutes_without_electricity % 60)
+    
+    percentage = round((count_non_negative / elapsed_minutes) * 100, 2)
+    
+    with_electricity_str = f"{hours_with}h {mins_with}m" if hours_with > 0 else f"{mins_with}m"
+    without_electricity_str = f"{hours_without}h {mins_without}m" if hours_without > 0 else f"{mins_without}m"
     
     message = (
         f"⚡ Electicity stat for the past day (since the midnight)⚡\n\n"
-        f"✅ With electricity: {hours_with_electricity} hours\n"
-        f"❌ Without electricity: {hours_without_electricity} hours\n"
+        f"✅ With electricity: {with_electricity_str}\n"
+        f"❌ Without electricity: {without_electricity_str}\n"
         f"📊 Percentage of time with electricity: {percentage}%"
     )
     
