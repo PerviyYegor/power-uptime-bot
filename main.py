@@ -25,7 +25,7 @@ def main():
         json_output = json.dumps(stats, indent=2, ensure_ascii=False)
         print(json_output)
 
-        dtek_schedule = fetch_schedule(region="dnipro", group="2.1", index=date.weekday(date.today())+1)
+        dtek_schedule = fetch_schedule(region="dnipro", group="2.1", index=date.weekday(date.today()+timedelta(days=1)))
         
         print(json.dumps(dtek_schedule, indent=2, ensure_ascii=False))
         if is_initialized() and stats.get("status") == "success" and dtek_schedule.get("status") == "success":
